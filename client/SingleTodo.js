@@ -8,14 +8,21 @@ export default class SingleTodo extends Component {
   constructor () {
     super()
     this.state = {
-      todo: {}
+      todo: {},
+      serverError:false
     }
+    this.update=this.update.bind(this)
   }
 
-  async componentDidMount () {
+  update(newTodo){
+    this.setState({todo:newTodo})
+  }
+
+  componentDidMount () {
     const todoId = this.props.match.params.todoId
-    const res = await axios.get(`/api/todos/${todoId}`)
-    this.setState({todo: res.data})
+    axios.get(`/api/todos/${todoId}`)
+    .then((res)=>this.setState({todo: res.data}))
+    .catch(this.setState({serverError:true}))
   }
 
   render () {
@@ -24,7 +31,7 @@ export default class SingleTodo extends Component {
     return (
       <div id='single-todo'>
         <Todo todo={todo} />
-        <UpdateTodo />
+        <UpdateTodo todo={this.state.todo} update={this.update} serverE={this.state.serverError}/>
         <Link to='/'>Back</Link>
       </div>
     )
